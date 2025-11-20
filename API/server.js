@@ -1,3 +1,4 @@
+const fs = require("fs");
 const express = require("express");
 const mysql = require("mysql2");
 const bcrypt = require("bcrypt");
@@ -10,10 +11,23 @@ app.use(bodyParser.json());
 
 // MySQL connection
 const db = mysql.createConnection({
-  host: "127.0.0.1",
-  user: "root",
-  password: "SQL#Preethi*&^%$#@!",
-  database: "mobile",
+  host: "mobapp-techappzy-0ed2.j.aivencloud.com",
+  user: "avnadmin",
+  password: "AVNS_jUc7DOXy0m2M9HMAQk2",
+  database: "mobapp",
+  port: 14708,
+  ssl: {
+    rejectUnauthorized: true,
+    ca: fs.readFileSync("./ca.pem"), // DOWNLOAD FROM AIVEN
+  },
+});
+
+db.connect((err) => {
+  if (err) {
+    console.log("DB ERROR:", err);
+  } else {
+    console.log("DB CONNECTED SUCCESSFULLY!");
+  }
 });
 
 // Register endpoint
