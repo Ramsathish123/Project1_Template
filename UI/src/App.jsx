@@ -8,7 +8,7 @@ import "./App.css";
 import LeftMenu from "./pages/Menu/LeftMenu";
 import Dashboard from "./pages/dashboard/dashboard";
 import Stock from "./pages/Stock/Stock";
-import Expense from "./pages/Expense/Expense";
+import Expense from "./pages/expense/Expense";
 import Service from "./pages/Service/Service";
 import Invoice from "./pages/Invoice/Invoice";
 import { FileProvider } from "./context/Filecontext";
