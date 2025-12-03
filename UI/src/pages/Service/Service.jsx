@@ -41,14 +41,7 @@ import {
   Spinner, // <-- Added Spinner import
 } from "@chakra-ui/react";
 import { useState, useEffect } from "react";
-import {
-  FiPlus,
-  FiPhone,
-  FiUser,
-  FiSmartphone,
-  FiAlertCircle,
-  FiPrinter,
-} from "react-icons/fi";
+import { FiPlus, FiPhone, FiUser, FiSmartphone, FiAlertCircle, FiPrinter } from "react-icons/fi";
 import axios from "axios";
 import { showToast } from "../../utils/toast";
 const Service = () => {
@@ -79,16 +72,8 @@ const Service = () => {
     balCost: "",
   });
   const [loading, setLoading] = useState(false); // <-- Added loading state
-  const {
-    isOpen: isAddServiceOpen,
-    onOpen: onAddserviceOpen,
-    onClose: onAddServiceClose,
-  } = useDisclosure();
-  const {
-    isOpen: isServicePrintOpen,
-    onOpen: onServicePrintOpen,
-    onClose: onServicePrintClose,
-  } = useDisclosure();
+  const { isOpen: isAddServiceOpen, onOpen: onAddserviceOpen, onClose: onAddServiceClose } = useDisclosure();
+  const { isOpen: isServicePrintOpen, onOpen: onServicePrintOpen, onClose: onServicePrintClose } = useDisclosure();
   const handleCostChange = () => {
     const advance = parseFloat(formState.advanceCost) || 0;
     const balance = parseFloat(formState.balCost) || 0;
@@ -132,12 +117,7 @@ const Service = () => {
 
   const handleAddService = async () => {
     try {
-      if (
-        !formData.customerName ||
-        !formData.mobileNumber ||
-        !formData.mobileModel ||
-        !formData.issue
-      ) {
+      if (!formData.customerName || !formData.mobileNumber || !formData.mobileModel || !formData.issue) {
         throw new Error("Please fill all required fields");
       }
       const payload = {
@@ -151,16 +131,13 @@ const Service = () => {
         advance: formData.advance,
       };
 
-      const response = await fetch(
-        `${import.meta.env.VITE_API_BASE_URL}/mobile_service`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(payload),
-        }
-      );
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/mobile_service`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      });
 
       const data = await response.json();
 
@@ -208,6 +185,12 @@ const Service = () => {
         return "orange";
     }
   };
+const savedconfig = localStorage.getItem("companyConfig");
+const parsed = savedconfig ? JSON.parse(savedconfig) : null;
+const config = parsed?.value || parsed;
+const companyName = config?.name || "Company Name";
+const mobileNumber = config?.phone || "";
+const place=config?.address || "";
 
   const fetchServices = async (page = 1, date = "") => {
     setLoading(true); // <-- Set loading true
@@ -229,9 +212,7 @@ const Service = () => {
           mobileNumber: item.mob_no,
           issue: item.issue_details,
           status: item.status,
-          date: item.received_date
-            ? new Date(item.received_date).toLocaleDateString("en-IN")
-            : "N/A",
+          date: item.received_date ? new Date(item.received_date).toLocaleDateString("en-IN") : "N/A",
         }));
         setServices(formatted);
         setCurrentPage(json.currentPage);
@@ -253,9 +234,7 @@ const Service = () => {
   const fetchServiceCount = async () => {
     setLoading(true); // <-- Set loading true
     try {
-      const response = await fetch(
-        `${import.meta.env.VITE_API_BASE_URL}/get_service_count`
-      );
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/get_service_count`);
       const data = await response.json();
       if (response.ok) {
         setServiceCount(data);
@@ -279,14 +258,11 @@ const Service = () => {
       advance: parseFloat(formState.advanceCost),
     };
 
-    const response = await fetch(
-      `${import.meta.env.VITE_API_BASE_URL}/update_service`,
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      }
-    );
+    const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/update_service`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
 
     if (response.ok) {
       showToast({
@@ -314,9 +290,7 @@ const Service = () => {
     return `${dd}-${mm}-${yyyy}`;
   }
   const handlePrint = async (id) => {
-    const updatedData = await fetch(
-      `${import.meta.env.VITE_API_BASE_URL}/get_service_by_id/${id}`
-    );
+    const updatedData = await fetch(`${import.meta.env.VITE_API_BASE_URL}/get_service_by_id/${id}`);
     const serviceData = await updatedData.json();
 
     // Format for printReceipt
@@ -338,9 +312,7 @@ const Service = () => {
 
   const handleEdit = async (id) => {
     try {
-      const response = await axios.post(
-        `${import.meta.env.VITE_API_BASE_URL}/services/${id}`
-      );
+      const response = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/services/${id}`);
       const data = response.data;
       setFormState({
         service_id: data.service_id,
@@ -360,22 +332,10 @@ const Service = () => {
   const printReceipt = (data) => {
     const receiptWindow = window.open("", "PRINT", "height=600,width=800");
 
-    const {
-      service_no,
-      customerName,
-      mobileNumber,
-      product,
-      issue,
-      amount,
-      advance,
-      status,
-      address,
-      delivery_date,
-    } = data;
+    const { service_no, customerName,  product, issue, amount, advance, status, address, delivery_date } =
+      data;
 
-    const balance = (
-      parseFloat(amount || 0) - parseFloat(advance || 0)
-    ).toFixed(2);
+    const balance = (parseFloat(amount || 0) - parseFloat(advance || 0)).toFixed(2);
 
     const receiptHTML = `
     <html>
@@ -445,9 +405,9 @@ const Service = () => {
     </head>
     <body>
       <div class="receipt-container">
-        <div class="center bold">Muthu Mobiles</div>
-        <div class="center">Uranipuram</div>
-        <div class="center">Mob:9791611603,9363230745</div>
+        <div class="center bold">${companyName}</div>
+        <div class="center">${place}</div>
+        <div class="center">${mobileNumber}</div>
         <div class="line"></div>
 
         <div class="row">
@@ -497,7 +457,7 @@ const Service = () => {
           <b>NO WARRANTY, NO GUARANTEE</b><br><br>
           <div>
             <b>Customer Signature</b> ________________________ 
-            <span style="float:right;">For. Muthu Mobiles</span>
+            <span style="float:right;">For. ${companyName}</span>
           </div>
         </div>
         <div class="line"></div>
@@ -691,10 +651,7 @@ const Service = () => {
                       <Tr key={service.id}>
                         <Td className="clickable-id">{service.serviceNo}</Td>
 
-                        <Td
-                          className="clickable-id"
-                          onClick={() => handleEdit(service.service_id)}
-                        >
+                        <Td className="clickable-id" onClick={() => handleEdit(service.service_id)}>
                           {service.customerName}
                         </Td>
 
@@ -704,11 +661,7 @@ const Service = () => {
                         <Td className="text-left">{service.issue}</Td>
 
                         <Td>
-                          <Tag
-                            colorScheme={getStatusColor(service.status)}
-                            size="sm"
-                            borderRadius="full"
-                          >
+                          <Tag colorScheme={getStatusColor(service.status)} size="sm" borderRadius="full">
                             <TagLabel>{service.status}</TagLabel>
                           </Tag>
                         </Td>
@@ -742,9 +695,7 @@ const Service = () => {
 
               {/* Pagination Footer */}
               <Flex className="pagination-footer">
-                <Text className="pagination-text">
-                  Showing {services.length} items
-                </Text>
+                <Text className="pagination-text">Showing {services.length} items</Text>
 
                 <HStack spacing={2}>
                   <Button
@@ -764,9 +715,7 @@ const Service = () => {
                     <Button
                       key={i}
                       size="xs"
-                      className={`pagination-btn ${
-                        currentPage === i + 1 ? "active" : ""
-                      }`}
+                      className={`pagination-btn ${currentPage === i + 1 ? "active" : ""}`}
                       onClick={() => {
                         setCurrentPage(i + 1);
                         fetchServices(i + 1, searchdate);
@@ -801,12 +750,7 @@ const Service = () => {
         <ModalContent className="modal-box">
           <ModalHeader className="modal-header">
             <Flex align="center" gap={2}>
-              <Avatar
-                icon={<FiPlus />}
-                bg="blue.100"
-                color="blue.600"
-                size="sm"
-              />
+              <Avatar icon={<FiPlus />} bg="blue.100" color="blue.600" size="sm" />
               New Service Request
             </Flex>
           </ModalHeader>
@@ -891,10 +835,7 @@ const Service = () => {
                   <FormLabel>Balance (auto)</FormLabel>
                   <Input
                     isReadOnly
-                    value={(
-                      Number(formData.actual_cost || 0) -
-                      Number(formData.advance || 0)
-                    ).toFixed(2)}
+                    value={(Number(formData.actual_cost || 0) - Number(formData.advance || 0)).toFixed(2)}
                   />
                 </FormControl>
               </Flex>
@@ -916,23 +857,14 @@ const Service = () => {
             <Button className="btn-cancel" size="sm" onClick={onClose}>
               Cancel
             </Button>
-            <Button
-              className="btn-primary"
-              size="sm"
-              onClick={handleAddService}
-            >
+            <Button className="btn-primary" size="sm" onClick={handleAddService}>
               Create Service
             </Button>
           </ModalFooter>
         </ModalContent>
       </Modal>
 
-      <Modal
-        isOpen={isServicePrintOpen}
-        onClose={onServicePrintClose}
-        size="md"
-        isCentered
-      >
+      <Modal isOpen={isServicePrintOpen} onClose={onServicePrintClose} size="md" isCentered>
         <ModalOverlay />
         <ModalContent className="modal-box">
           <ModalHeader className="modal-header">Update Service</ModalHeader>
@@ -945,9 +877,7 @@ const Service = () => {
                 <FormLabel>Issue Details</FormLabel>
                 <Textarea
                   value={formState.issueDetails}
-                  onChange={(e) =>
-                    setFormState({ ...formState, issueDetails: e.target.value })
-                  }
+                  onChange={(e) => setFormState({ ...formState, issueDetails: e.target.value })}
                 />
               </FormControl>
 
@@ -1009,9 +939,7 @@ const Service = () => {
       {loading && (
         <Box className="loading-overlay">
           <Spinner size="xl" color="#625DF0" thickness="4px" mb={2} />
-          <Text className="loading-text">
-            Retrieving records, please wait...
-          </Text>
+          <Text className="loading-text">Retrieving records, please wait...</Text>
         </Box>
       )}
     </Box>

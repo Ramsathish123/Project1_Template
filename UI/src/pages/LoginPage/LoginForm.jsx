@@ -3,7 +3,6 @@ import {
   Button,
   Flex,
   FormControl,
-  Heading,
   Input,
   InputGroup,
   InputRightElement,
@@ -12,7 +11,7 @@ import {
   Select,
   Text,
 } from "@chakra-ui/react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import { useFileContext } from "../../context/Filecontext";
@@ -26,23 +25,42 @@ export default function LoginForm() {
   const [isLoading, setIsLoading] = useState(false);
   const [role, setRole] = useState("");
 
+  const [companyLogo, setCompanyLogo] = useState(null); // 🔥 dynamic logo
+  const [companyName, setCompanyName] = useState("");
+
   const navigate = useNavigate();
   const { setUsers } = useFileContext();
+  const API_BASE = import.meta.env.VITE_API_BASE_URL;
+
+  // 🔥 Load config logo on page open
+  useEffect(() => {
+    fetch(`${API_BASE}/config`)
+      .then((res) => res.json())
+      .then((data) => {
+        if (data && data.logo_url) {
+          setCompanyLogo(`${API_BASE}${data.logo_url}`);
+        }
+        if (data?.name) {
+          setCompanyName(data.name);
+        }
+        setLocalStorageItem("companyConfig", data);
+      })
+      .catch(() => {});
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
 
     try {
-      const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/login`, {
+      const res = await fetch(`${API_BASE}/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password, role }),
       });
 
       const data = await res.json();
-      await setUsers(data.user);
-      await setLocalStorageItem("user", data.user);
+
       if (!res.ok) {
         showToast({
           title: "Login failed",
@@ -78,10 +96,19 @@ export default function LoginForm() {
     <Flex className="login-wrapper">
       <Box className="login-card">
         <Stack spacing={5} align="center" mb={4}>
-          <Image src="/logo.jpg" alt="Logo" className="login-logo" />
+          
+          {/* 🔥 Show stored logo ONLY (no default) */}
+          {companyLogo && (
+            <Image
+              src={companyLogo}
+              alt="Company Logo"
+              className="login-logo"
+            />
+          )}
 
+          {/* Dynamic title based on DB name */}
           <Text className="login-title" fontFamily={"inter"}>
-            Welcome Back to TechAppzy
+            {companyName ? `Welcome to ${companyName}` : "Welcome Back"}
           </Text>
         </Stack>
 
@@ -106,7 +133,6 @@ export default function LoginForm() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                 />
-
                 <InputRightElement>
                   <Button
                     className="icon-btn"

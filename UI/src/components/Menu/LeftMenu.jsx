@@ -1,23 +1,7 @@
 import React, { useEffect } from "react";
-import {
-  Box,
-  Flex,
-  IconButton,
-  useBreakpointValue,
-  VStack,
-  Link,
-  Text,
-  Tooltip,
-  Icon,
-} from "@chakra-ui/react";
+import { Box, Flex, IconButton, useBreakpointValue, VStack, Link, Text, Tooltip, Icon } from "@chakra-ui/react";
 import { FiMenu, FiX, FiHome, FiBox, FiTruck } from "react-icons/fi";
-import {
-  RiBillLine,
-  RiMoneyDollarCircleLine,
-  RiPieChartLine,
-  RiUserAddLine,
-  RiToolsLine,
-} from "react-icons/ri";
+import { RiBillLine, RiMoneyDollarCircleLine, RiPieChartLine, RiUserAddLine, RiToolsLine } from "react-icons/ri";
 import { Outlet, Link as RouterLink, useLocation } from "react-router-dom";
 import { getLocalStorageItem } from "../../utils/localStoragesHelper";
 import { useMenu } from "../../components/Menuprovider";
@@ -29,13 +13,7 @@ const LeftMenu = () => {
   const isMobile = useBreakpointValue({ base: true, md: false });
   const location = useLocation();
 
-  const {
-    isMenuOpen,
-    toggleMenu,
-    isMobileMenuOpen,
-    toggleMobileMenu,
-    closeMobileMenu,
-  } = useMenu();
+  const { isMenuOpen, toggleMenu, isMobileMenuOpen, toggleMobileMenu, closeMobileMenu } = useMenu();
 
   const storedUser = getLocalStorageItem("user");
 
@@ -54,12 +32,14 @@ const LeftMenu = () => {
           { icon: RiMoneyDollarCircleLine, label: "Expense", href: "/expense" },
           { icon: RiPieChartLine, label: "Report", href: "/report" },
           { icon: RiUserAddLine, label: "Register", href: "/register" },
+          { icon: FiHome, label: "Company Config", href: "/company-config" },
         ];
-
+  const savedconfig = localStorage.getItem("companyConfig");
+  const parsed = savedconfig ? JSON.parse(savedconfig) : null;
+  const config = parsed?.value || parsed;
   const showText = isMobile ? isMobileMenuOpen : isMenuOpen;
-
-  const isActiveLink = (href) =>
-    location.pathname === href || location.pathname.startsWith(href + "/");
+  const logo=config?.logo_url ? `${import.meta.env.VITE_API_BASE_URL}${config.logo_url}` : null;
+  const isActiveLink = (href) => location.pathname === href || location.pathname.startsWith(href + "/");
 
   useEffect(() => {
     if (isMobile) closeMobileMenu();
@@ -71,41 +51,40 @@ const LeftMenu = () => {
       <Box
         as="nav"
         className={`sidebar ${
-          isMobile
-            ? isMobileMenuOpen
-              ? "open"
-              : "collapsed"
-            : isMenuOpen
-            ? "open"
-            : "collapsed"
+          isMobile ? (isMobileMenuOpen ? "open" : "collapsed") : isMenuOpen ? "open" : "collapsed"
         }`}
         w={isMobile ? "250px" : isMenuOpen ? "200px" : "70px"}
         position={isMobile ? "fixed" : "relative"}
       >
         <Flex direction="column" h="full">
           {/* Logo */}
-          <Flex
-            className="sidebar-logo"
-            justify={showText ? "flex-start" : "center"}
-          >
-            <img src="/logo.png" alt="TechAppzy Logo" />
-            {showText && (
-              <Box>
-                <Text className="sidebar-logo-text">TechAppzy</Text>
-                <Text className="sidebar-logo-sub">Business Suite</Text>
-              </Box>
-            )}
-          </Flex>
+          <Flex className="sidebar-logo" justify={showText ? "flex-start" : "center"}>
+  {logo && (
+    <img
+      src={logo}
+      alt="Company Logo"
+      style={{
+        width: showText ? "45px" : "40px",
+        height: "45px",
+        borderRadius: "8px",
+        marginRight: showText ? "10px" : "0px",
+        objectFit: "cover"
+      }}
+    />
+  )}
+  {showText && (
+    <Box>
+      <Text className="sidebar-logo-text">{config?.name || "TechAppzy"}</Text>
+      <Text className="sidebar-logo-sub">Business Suite</Text>
+    </Box>
+  )}
+</Flex>
+
 
           {/* Mobile Menu Close */}
           {isMobile && (
             <Flex justify="flex-end" p={2}>
-              <IconButton
-                icon={<FiX />}
-                aria-label="Close menu"
-                className="icon-btn"
-                onClick={closeMobileMenu}
-              />
+              <IconButton icon={<FiX />} aria-label="Close menu" className="icon-btn" onClick={closeMobileMenu} />
             </Flex>
           )}
 
@@ -142,9 +121,7 @@ const LeftMenu = () => {
           {/* User Info */}
           {showText && storedUser && (
             <Box className="sidebar-user">
-              <Text className="sidebar-user-name">
-                {storedUser.name || storedUser.email}
-              </Text>
+              <Text className="sidebar-user-name">{storedUser.name || storedUser.email}</Text>
               <Text className="sidebar-user-role">{storedUser.role}</Text>
             </Box>
           )}

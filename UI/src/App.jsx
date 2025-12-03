@@ -15,6 +15,7 @@ import PrivateRoute from "../src/components/Route/PrivateRoute";
 import { MenuProvider } from "./components/Menuprovider";
 import LeftMenu from "./components/Menu/LeftMenu";
 import Supplier from "./pages/Supplier/Supplier";
+import CompanyConfig from "./pages/CompanyConfig";
 
 function App() {
   return (
@@ -29,6 +30,7 @@ function App() {
             {/* Layout route with nested content */}
             <Route element={<PrivateRoute />}>
               <Route path="/" element={<LeftMenu />}>
+                <Route path="company-config" element={<CompanyConfig />} />
                 <Route path="stock" element={<Stock />} />
                 <Route path="supplier" element={<Supplier />} />
                 <Route path="expense" element={<Expense />} />
